@@ -7,6 +7,7 @@ import (
 
 	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
 func tablePanosAddressObject(ctx context.Context) *plugin.Table {
@@ -29,16 +30,22 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 			{Name: "value", Type: proto.ColumnType_STRING, Description: "The address object's value."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The address object's description."},
 			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
+			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
 		},
 	}
 }
 
 func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+
+	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "step", "about to connect")
+
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_address_object.listAddressObject", "connection_error", err)
 		return nil, err
 	}
+
+	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
@@ -52,6 +59,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 			if keyQuals["vsys"] != nil {
 				id = keyQuals["vsys"].GetStringValue()
 			}
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", id)
 			listing, err = client.Objects.Address.GetList(id)
 		}
 	case *pango.Panorama:
@@ -60,6 +68,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 			if keyQuals["device_group"] != nil {
 				id = keyQuals["shared"].GetStringValue()
 			}
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", id)
 			listing, err = client.Objects.Address.GetList(id)
 		}
 	}
@@ -69,7 +78,10 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 		return nil, err
 	}
 
+	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "len(listing)", len(listing))
+
 	for _, i := range listing {
+		plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "listing.i", i)
 		d.StreamListItem(ctx, i)
 	}
 
