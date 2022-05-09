@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/PaloAltoNetworks/pango"
+	"github.com/PaloAltoNetworks/pango/objs/addr"
 
 	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
@@ -24,8 +25,8 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 		Columns: []*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The address object's name."},
-			{Name: "vsys", Type: proto.ColumnType_STRING, Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromQual("vsys"), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromQual("device_group"), Description: "[Panorama] The device group location (default: shared)"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of address object."},
 			{Name: "value", Type: proto.ColumnType_STRING, Description: "The address object's value."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The address object's description."},
@@ -50,7 +51,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
 	var id string
-	var listing []string
+	var listing []addr.Entry
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
@@ -60,7 +61,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				id = keyQuals["vsys"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", id)
-			listing, err = client.Objects.Address.GetList(id)
+			listing, err = client.Objects.Address.GetAll(id)
 		}
 	case *pango.Panorama:
 		{
@@ -69,7 +70,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				id = keyQuals["shared"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", id)
-			listing, err = client.Objects.Address.GetList(id)
+			listing, err = client.Objects.Address.GetAll(id)
 		}
 	}
 
