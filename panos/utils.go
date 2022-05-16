@@ -41,13 +41,12 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 		return nil, errors.New("hostname and api_key must be configured")
 	}
 
-	conn, err := pango.ConnectUsing(
+	conn, err := pango.Connect(
 		pango.Client{
 			Hostname: hostname,
-			ApiKey:   apiKey,
+			Username: *panosConfig.Username,
+			Password: *panosConfig.Password,
 		},
-		"",
-		true,
 	)
 
 	if err != nil {

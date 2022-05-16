@@ -8,6 +8,8 @@ import (
 type panosConfig struct {
 	Hostname *string `cty:"hostname"`
 	APIKey   *string `cty:"api_key"`
+	Username *string `cty:"username"`
+	Password *string `cty:"password"`
 }
 
 var ConfigSchema = map[string]*schema.Attribute{
@@ -15,6 +17,12 @@ var ConfigSchema = map[string]*schema.Attribute{
 		Type: schema.TypeString,
 	},
 	"api_key": {
+		Type: schema.TypeString,
+	},
+	"username": {
+		Type: schema.TypeString,
+	},
+	"password": {
 		Type: schema.TypeString,
 	},
 }
