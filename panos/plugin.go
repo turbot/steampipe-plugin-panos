@@ -20,6 +20,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 		},
 		TableMap: map[string]*plugin.Table{
 			"panos_address_object": tablePanosAddressObject(ctx),
+			"panos_tag_object":     tablePanosTagObject(ctx),
 			"panos_security_rule":  tablePanosSecurityRule(ctx),
 		},
 	}
