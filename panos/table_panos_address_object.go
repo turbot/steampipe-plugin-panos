@@ -20,6 +20,7 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 			KeyColumns: []*plugin.KeyColumn{
 				{Name: "vsys", Require: plugin.Optional},
 				{Name: "device_group", Require: plugin.Optional},
+				{Name: "name", Require: plugin.Optional},
 			},
 		},
 		Columns: []*plugin.Column{
@@ -55,8 +56,13 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
-	var vsys, deviceGroup string
+	var vsys, deviceGroup, name string
 	var listing []addr.Entry
+	var entry addr.Entry
+
+	if d.KeyColumnQuals["name"] != nil {
+		name = d.KeyColumnQuals["name"].GetStringValue()
+	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
@@ -66,7 +72,14 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", vsys)
-			listing, err = client.Objects.Address.GetAll(vsys)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.name", vsys)
+
+			if name != "" {
+				entry, err = client.Objects.Address.Get(vsys, name)
+				listing = []addr.Entry{entry}
+			} else {
+				listing, err = client.Objects.Address.GetAll(vsys)
+			}
 		}
 	case *pango.Panorama:
 		{
@@ -75,7 +88,13 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", deviceGroup)
-			listing, err = client.Objects.Address.GetAll(deviceGroup)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.name", name)
+			if name != "" {
+				entry, err = client.Objects.Address.Get(deviceGroup, name)
+				listing = []addr.Entry{entry}
+			} else {
+				listing, err = client.Objects.Address.GetAll(deviceGroup)
+			}
 		}
 	}
 
