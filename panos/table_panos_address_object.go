@@ -72,9 +72,9 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", vsys)
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.name", vsys)
 
 			if name != "" {
+				plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.name", name)
 				entry, err = client.Objects.Address.Get(vsys, name)
 				listing = []addr.Entry{entry}
 			} else {
@@ -88,11 +88,12 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
 			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", deviceGroup)
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.name", name)
+
 			if name != "" {
 				entry, err = client.Objects.Address.Get(deviceGroup, name)
 				listing = []addr.Entry{entry}
 			} else {
+				plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.name", name)
 				listing, err = client.Objects.Address.GetAll(deviceGroup)
 			}
 		}

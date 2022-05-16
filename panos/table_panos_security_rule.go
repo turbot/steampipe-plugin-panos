@@ -5,6 +5,7 @@ import (
 
 	"github.com/PaloAltoNetworks/pango"
 	"github.com/PaloAltoNetworks/pango/poli/security"
+	"github.com/PaloAltoNetworks/pango/util"
 
 	"github.com/turbot/steampipe-plugin-sdk/v3/grpc/proto"
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
@@ -20,6 +21,8 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			KeyColumns: []*plugin.KeyColumn{
 				{Name: "vsys", Require: plugin.Optional},
 				{Name: "device_group", Require: plugin.Optional},
+				{Name: "name", Require: plugin.Optional},
+				{Name: "rule_base", Require: plugin.Optional},
 			},
 		},
 		Columns: []*plugin.Column{
@@ -57,11 +60,19 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			{Name: "file_blocking", Type: proto.ColumnType_STRING, Description: ""},
 			{Name: "wild_fire_analysis", Type: proto.ColumnType_STRING, Description: ""},
 			{Name: "data_filtering", Type: proto.ColumnType_STRING, Description: ""},
-			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromQual("vsys"), Description: "[NGFW] The vsys the security rule belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromQual("device_group"), Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the security rule belongs to (default: vsys1)."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "rule_base", Type: proto.ColumnType_STRING, Transform: transform.FromField("RuleBase").NullIfZero(), Description: "The rulebase. This can be either pre-rulebase (default), rulebase, or post-rulebase."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the security rule."},
 		},
 	}
+}
+
+type securityRuleStruct struct {
+	VSys        string
+	DeviceGroup string
+	RuleBase    string
+	security.Entry
 }
 
 func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
@@ -73,32 +84,52 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "connection_error", err)
 		return nil, err
 	}
-
 	plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
-	var id string
+	var vsys, deviceGroup, name string
 	var listing []security.Entry
+	var entry security.Entry
+
+	ruleBase := util.PreRulebase
+	if keyQuals["rule_base"] != nil {
+		ruleBase = keyQuals["rule_base"].GetStringValue()
+	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			id = "vsys1"
+			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
-				id = keyQuals["vsys"].GetStringValue()
+				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id", id)
-			listing, err = client.Policies.Security.GetAll(id)
+			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id", vsys)
+
+			if name != "" {
+				plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.name", name)
+				entry, err = client.Policies.Security.Get(vsys, name)
+				listing = []security.Entry{entry}
+			} else {
+				listing, err = client.Policies.Security.GetAll(vsys)
+			}
 		}
 	case *pango.Panorama:
 		{
-			id = "shared"
+			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
-				id = keyQuals["shared"].GetStringValue()
+				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id", id)
-			listing, err = client.Policies.Security.GetAll(id, "pre-rulebase")
+			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id", deviceGroup)
+
+			if name != "" {
+				plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.name", name)
+
+				entry, err = client.Policies.Security.Get(deviceGroup, ruleBase, name)
+				listing = append(listing, entry)
+			} else {
+				listing, err = client.Policies.Security.GetAll(deviceGroup, ruleBase)
+			}
 		}
 	}
 
@@ -111,7 +142,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 
 	for _, i := range listing {
 		plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "listing.i", i)
-		d.StreamListItem(ctx, i)
+		d.StreamListItem(ctx, securityRuleStruct{vsys, deviceGroup, ruleBase, i})
 	}
 
 	return nil, nil
