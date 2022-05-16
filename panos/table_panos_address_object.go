@@ -25,8 +25,8 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 		Columns: []*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The address object's name."},
-			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromQual("vsys"), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromQual("device_group"), Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of address object."},
 			{Name: "value", Type: proto.ColumnType_STRING, Description: "The address object's value."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The address object's description."},
@@ -34,6 +34,12 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
 		},
 	}
+}
+
+type addressStruct struct {
+	VSys        string
+	DeviceGroup string
+	addr.Entry
 }
 
 func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
@@ -45,32 +51,31 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 		plugin.Logger(ctx).Error("panos_address_object.listAddressObject", "connection_error", err)
 		return nil, err
 	}
-
 	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
-	var id string
+	var vsys, deviceGroup string
 	var listing []addr.Entry
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			id = "vsys1"
+			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
-				id = keyQuals["vsys"].GetStringValue()
+				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", id)
-			listing, err = client.Objects.Address.GetAll(id)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", vsys)
+			listing, err = client.Objects.Address.GetAll(vsys)
 		}
 	case *pango.Panorama:
 		{
-			id = "shared"
+			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
-				id = keyQuals["shared"].GetStringValue()
+				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", id)
-			listing, err = client.Objects.Address.GetAll(id)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", deviceGroup)
+			listing, err = client.Objects.Address.GetAll(deviceGroup)
 		}
 	}
 
@@ -83,7 +88,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 
 	for _, i := range listing {
 		plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "listing.i", i)
-		d.StreamListItem(ctx, i)
+		d.StreamListItem(ctx, addressStruct{vsys, deviceGroup, i})
 	}
 
 	return nil, nil
