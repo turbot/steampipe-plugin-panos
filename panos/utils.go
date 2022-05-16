@@ -24,6 +24,8 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 	// Default to using env vars
 	hostname := os.Getenv("PANOS_HOSTNAME")
 	apiKey := os.Getenv("PANOS_API_KEY")
+	username := os.Getenv("PANOS_USERNAME")
+	password := os.Getenv("PANOS_PASSWORD")
 
 	// But prefer the config
 	panosConfig := GetConfig(d.Connection)
@@ -34,18 +36,37 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 		if panosConfig.APIKey != nil {
 			apiKey = *panosConfig.APIKey
 		}
+		if panosConfig.Username != nil {
+			username = *panosConfig.Username
+		}
+		if panosConfig.Password != nil {
+			password = *panosConfig.Password
+		}
 	}
 
-	if hostname == "" || apiKey == "" {
+	if len(hostname) == 0 {
 		// Credentials not set
-		return nil, errors.New("hostname and api_key must be configured")
+		return nil, errors.New("hostname must be configured")
+	}
+
+	if !isAPIKeyDefined(apiKey) && !isUsernamePasswordDefined(username, password) {
+		// Credentials not set
+		return nil, errors.New("either 'api_key' or 'username-password' must be configured")
+	}
+
+	if isAPIKeyDefined(apiKey) {
+		// if the api key is defined,
+		// then choose those over the username/password combo
+		username = ""
+		password = ""
 	}
 
 	conn, err := pango.Connect(
 		pango.Client{
 			Hostname: hostname,
-			Username: *panosConfig.Username,
-			Password: *panosConfig.Password,
+			ApiKey:   apiKey,
+			Username: username,
+			Password: password,
 		},
 	)
 
@@ -61,4 +82,12 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 
 func isNotFoundError(err error) bool {
 	return strings.Contains(err.Error(), "Resource not found")
+}
+
+func isAPIKeyDefined(apiKey string) bool {
+	return apiKey != ""
+}
+
+func isUsernamePasswordDefined(username string, password string) bool {
+	return username != "" && password != ""
 }
