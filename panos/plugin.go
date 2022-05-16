@@ -22,6 +22,7 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			"panos_address_object": tablePanosAddressObject(ctx),
 			"panos_tag_object":     tablePanosTagObject(ctx),
 			"panos_security_rule":  tablePanosSecurityRule(ctx),
+			"panos_nat_rule_group": tablePanosNATRuleGroup(ctx),
 		},
 	}
 	return p
