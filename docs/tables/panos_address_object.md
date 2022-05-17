@@ -10,10 +10,11 @@ Address objects in the PAN-OS endpoint.
 select
   *
 from
-  panos_address_object
+  panos_address_object;
 ```
 
 ### List all address objects ordered by object name
+
 ```sql
 select
   name,
@@ -21,11 +22,10 @@ select
   description
 from
   panos_address_object
-order by
-  name
+order by name;
 ```
 
-```
+```sh
 +----------+-----------------+-------------------------+
 | name     | value           | description             |
 +----------+-----------------+-------------------------+

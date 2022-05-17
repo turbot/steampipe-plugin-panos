@@ -17,6 +17,7 @@ og_image: "/images/plugins/turbot/panos-social-graphic.png"
 [PAN-OS](https://docs.paloaltonetworks.com/pan-os) is the operating system for Palo Alto Networks NGFWs and Panorama.
 
 Example query:
+
 ```sql
 select
   name,
@@ -28,7 +29,7 @@ order by
   name
 ```
 
-```
+```sh
 +----------+-----------------+-------------------------+
 | name     | value           | description             |
 +----------+-----------------+-------------------------+
@@ -62,20 +63,21 @@ connection "panos" {
 }
 ```
 
-* `hostname` - The hostname / IP address of PAN-OS.
-* `api_key` - The API key for the PAN-OS endpoint.
-* `username` - The username for the PAN-OS endpoint.
-* `password` - The password for the PAN-OS endpoint.
+- `hostname` - The hostname / IP address of PAN-OS.
+- `api_key` - The API key for the PAN-OS endpoint.
+- `username` - The username for the PAN-OS endpoint.
+- `password` - The password for the PAN-OS endpoint.
 
 Environment variables are also available as an alternate configuration method:
-* `PANOS_HOSTNAME`
-* `PANOS_API_KEY`
-* `PANOS_USERNAME`
-* `PANOS_PASSWORD`
+
+- `PANOS_HOSTNAME`
+- `PANOS_API_KEY`
+- `PANOS_USERNAME`
+- `PANOS_PASSWORD`
 
 > Note: If `api_key` or `PANOS_API_KEY` is used, then `username / PANOS_USERNAME` and `password / PANOS_PASSWORD` are ignored.
 
 ## Get involved
 
-* Open source: https://github.com/turbot/steampipe-plugin-panos
-* Community: [Slack Channel](https://steampipe.io/community/join)
+- Open source: https://github.com/turbot/steampipe-plugin-panos
+- Community: [Slack Channel](https://steampipe.io/community/join)

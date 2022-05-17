@@ -151,7 +151,6 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		}
 	}
 
-	// Error handling
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_nat_rule.listNATRule", "query_error", err)
 		return nil, err

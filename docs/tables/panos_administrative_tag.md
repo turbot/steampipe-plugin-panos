@@ -2,7 +2,7 @@
 
 Lists the administrative tags in PAN-OS.
 
-For a full reference on mapping `color` codes to `color` names, please refer to: https://registry.terraform.io/providers/PaloAltoNetworks/panos/latest/docs/resources/administrative_tag
+For a full reference on mapping `color` codes to `color` names, please refer to: https://registry.terraform.io/providers/PaloAltoNetworks/panos/latest/docs/resources/administrative_tag.
 
 ## Examples
 
@@ -42,4 +42,3 @@ from
 where
   device_group = 'group1'
 ```
-

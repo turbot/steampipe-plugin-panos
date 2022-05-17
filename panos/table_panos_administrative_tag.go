@@ -11,6 +11,8 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
+//// TABLE DEFINITION
+
 func tablePanosTagObject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_administrative_tag",
@@ -42,7 +44,12 @@ type tagStruct struct {
 	tags.Entry
 }
 
+//// LIST FUNCTION
+
 func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+
+	plugin.Logger(ctx).Trace("listTag")
+
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "connection_error", err)
@@ -51,10 +58,12 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
+
 	var vsys, deviceGroup, name string
 	var listing []tags.Entry
 	var entry tags.Entry
 
+	// Additional filter
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
 	}
@@ -62,12 +71,13 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Firewall.id")
 
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Objects.Tags.Get(vsys, name)
 				listing = []tags.Entry{entry}
@@ -77,11 +87,13 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		}
 	case *pango.Panorama:
 		{
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Panorama.id")
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Panorama.id")
+
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Objects.Tags.Get(deviceGroup, name)
 				listing = []tags.Entry{entry}

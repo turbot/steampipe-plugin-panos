@@ -11,6 +11,8 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
+//// TABLE DEFINITION
+
 func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_address_object",
@@ -26,13 +28,13 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 		Columns: []*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The address object's name."},
-			{Name: "type", Type: proto.ColumnType_STRING, Description: "Type of address - ip-netmask (default) | ip-range | ip-wildcard | fqdn"},
+			{Name: "type", Type: proto.ColumnType_STRING, Description: "Type of address - ip-netmask (default) | ip-range | ip-wildcard | fqdn."},
 			{Name: "value", Type: proto.ColumnType_STRING, Description: "IP address or other value of the object."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description of this object."},
 			{Name: "tags", Type: proto.ColumnType_JSON, Description: " Administrative tags."},
 
-			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "The vsys the address object belongs to (default: vsys1)."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "The device group location (default: shared)."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
 		},
 	}
@@ -44,7 +46,12 @@ type addressStruct struct {
 	addr.Entry
 }
 
+//// LIST FUNCTION
+
 func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+
+	plugin.Logger(ctx).Trace("listAddressObject")
+
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_address_object.listAddressObject", "connection_error", err)
@@ -53,10 +60,12 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
+
 	var vsys, deviceGroup, name string
 	var listing []addr.Entry
 	var entry addr.Entry
 
+	// Additional filters
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
 	}
@@ -64,12 +73,13 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id")
 
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Objects.Address.Get(vsys, name)
 				listing = []addr.Entry{entry}
@@ -79,12 +89,13 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 		}
 	case *pango.Panorama:
 		{
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id")
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id")
 
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Objects.Address.Get(deviceGroup, name)
 				listing = []addr.Entry{entry}
