@@ -25,11 +25,12 @@ func tablePanosTagObject(ctx context.Context) *plugin.Table {
 		},
 		Columns: []*plugin.Column{
 			// Top columns
-			{Name: "name", Type: proto.ColumnType_STRING, Description: "The tag object's name."},
+			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the tag."},
+			{Name: "color", Type: proto.ColumnType_STRING, Description: "Color ID."},
+			{Name: "comment", Type: proto.ColumnType_STRING, Description: "Comments."},
+
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
 			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
-			{Name: "color", Type: proto.ColumnType_STRING, Description: "The color of the Tag."},
-			{Name: "comment", Type: proto.ColumnType_STRING, Description: "Tag Comment."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the tag object."},
 		},
 	}

@@ -26,12 +26,13 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 		Columns: []*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "The address object's name."},
+			{Name: "type", Type: proto.ColumnType_STRING, Description: "Type of address - ip-netmask (default) | ip-range | ip-wildcard | fqdn"},
+			{Name: "value", Type: proto.ColumnType_STRING, Description: "IP address or other value of the object."},
+			{Name: "description", Type: proto.ColumnType_STRING, Description: "Description of this object."},
+			{Name: "tags", Type: proto.ColumnType_JSON, Description: " Administrative tags."},
+
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
 			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
-			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of address object."},
-			{Name: "value", Type: proto.ColumnType_STRING, Description: "The address object's value."},
-			{Name: "description", Type: proto.ColumnType_STRING, Description: "The address object's description."},
-			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
 		},
 	}
