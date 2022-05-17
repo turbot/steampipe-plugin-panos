@@ -11,37 +11,34 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin"
 )
 
-const defaultLimit uint64 = 1000
-
 func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 
 	// Load connection from cache, which preserves throttling protection etc
 	cacheKey := "panos"
 	if cachedData, ok := d.ConnectionManager.Cache.Get(cacheKey); ok {
-		return cachedData.(interface{}), nil
+		return cachedData, nil
 	}
 
 	// Default to using env vars
 	hostname := os.Getenv("PANOS_HOSTNAME")
-	apiKey := os.Getenv("PANOS_API_KEY")
 	username := os.Getenv("PANOS_USERNAME")
 	password := os.Getenv("PANOS_PASSWORD")
+	apiKey := os.Getenv("PANOS_API_KEY")
 
 	// But prefer the config
 	panosConfig := GetConfig(d.Connection)
-	if &panosConfig != nil {
-		if panosConfig.Hostname != nil {
-			hostname = *panosConfig.Hostname
-		}
-		if panosConfig.APIKey != nil {
-			apiKey = *panosConfig.APIKey
-		}
-		if panosConfig.Username != nil {
-			username = *panosConfig.Username
-		}
-		if panosConfig.Password != nil {
-			password = *panosConfig.Password
-		}
+
+	if panosConfig.Hostname != nil {
+		hostname = *panosConfig.Hostname
+	}
+	if panosConfig.APIKey != nil {
+		apiKey = *panosConfig.APIKey
+	}
+	if panosConfig.Username != nil {
+		username = *panosConfig.Username
+	}
+	if panosConfig.Password != nil {
+		password = *panosConfig.Password
 	}
 
 	if len(hostname) == 0 {
