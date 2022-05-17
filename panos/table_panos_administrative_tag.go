@@ -43,14 +43,14 @@ type tagStruct struct {
 
 func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 
-	plugin.Logger(ctx).Debug("panos_tag.listTag", "step", "about to connect")
+	plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "step", "about to connect")
 
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_tag.listTag", "connection_error", err)
+		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "connection_error", err)
 		return nil, err
 	}
-	plugin.Logger(ctx).Debug("panos_tag.listTag", "conn", conn)
+	plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
@@ -69,8 +69,8 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_tag.listTag", "Firewall.id", vsys)
-			plugin.Logger(ctx).Debug("panos_tag.listTag", "Firewall.name", vsys)
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Firewall.id", vsys)
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Firewall.name", vsys)
 
 			if name != "" {
 				entry, err = client.Objects.Tags.Get(vsys, name)
@@ -85,8 +85,8 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_tag.listTag", "Panorama.id", deviceGroup)
-			plugin.Logger(ctx).Debug("panos_tag.listTag", "Panorama.name", name)
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Panorama.id", deviceGroup)
+			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Panorama.name", name)
 			if name != "" {
 				entry, err = client.Objects.Tags.Get(deviceGroup, name)
 				listing = []tags.Entry{entry}
@@ -97,14 +97,14 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 	}
 
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_tag.listTag", "query_error", err)
+		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "query_error", err)
 		return nil, err
 	}
 
-	plugin.Logger(ctx).Debug("panos_tag.listTag", "len(listing)", len(listing))
+	plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "len(listing)", len(listing))
 
 	for _, i := range listing {
-		plugin.Logger(ctx).Debug("panos_tag.listTag", "listing.i", i)
+		plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "listing.i", i)
 		d.StreamListItem(ctx, tagStruct{vsys, deviceGroup, i})
 	}
 
