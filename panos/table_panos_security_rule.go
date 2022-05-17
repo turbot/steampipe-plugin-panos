@@ -26,7 +26,6 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			},
 		},
 		Columns: []*plugin.Column{
-			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the rule."},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The security rule's description."},
