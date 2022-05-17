@@ -17,7 +17,7 @@ import (
 func tablePanosNATRule(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_nat_rule",
-		Description: "NAT rules for the PAN-OS device.",
+		Description: "NAT rules for the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
 			Hydrate: listNATRule,
 			KeyColumns: []*plugin.KeyColumn{

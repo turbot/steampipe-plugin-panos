@@ -16,7 +16,7 @@ import (
 func tablePanosTagObject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_administrative_tag",
-		Description: "Tag objects for the PAN-OS endpoint.",
+		Description: "Tag objects in the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
 			Hydrate: listTag,
 			KeyColumns: []*plugin.KeyColumn{

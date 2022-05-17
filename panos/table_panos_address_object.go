@@ -16,7 +16,7 @@ import (
 func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_address_object",
-		Description: "Address objects for the PAN-OS device.",
+		Description: "Address objects in the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
 			Hydrate: listAddressObject,
 			KeyColumns: []*plugin.KeyColumn{

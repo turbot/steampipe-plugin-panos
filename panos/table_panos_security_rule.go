@@ -17,7 +17,7 @@ import (
 func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_security_rule",
-		Description: "Security rules for the PAN-OS device.",
+		Description: "Security rules for the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
 			Hydrate: listPanosSecurityRule,
 			KeyColumns: []*plugin.KeyColumn{
