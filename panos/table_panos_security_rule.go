@@ -99,6 +99,10 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		ruleBase = keyQuals["rule_base"].GetStringValue()
 	}
 
+	if keyQuals["name"] != nil {
+		name = keyQuals["name"].GetStringValue()
+	}
+
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
