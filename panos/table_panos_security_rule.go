@@ -19,7 +19,7 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 		Name:        "panos_security_rule",
 		Description: "Security rules for the PAN-OS device.",
 		List: &plugin.ListConfig{
-			Hydrate: listSecurityRule,
+			Hydrate: listPanosSecurityRule,
 			KeyColumns: []*plugin.KeyColumn{
 				{Name: "vsys", Require: plugin.Optional},
 				{Name: "device_group", Require: plugin.Optional},
@@ -30,11 +30,12 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 		Columns: []*plugin.Column{
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the rule."},
+			{Name: "uuid", Type: proto.ColumnType_STRING, Transform: transform.FromField("Uuid"), Description: "The PAN-OS UUID."},
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule.", Default: "universal"},
 			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Whether this rule is disabled"},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The security rule's description."},
 			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
-			
+
 			// Other columns
 			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "List of source zones."},
 			{Name: "source_addresses", Type: proto.ColumnType_JSON, Description: "List of source addresses."},
@@ -84,13 +85,13 @@ type securityRuleStruct struct {
 
 //// LIST FUNCTION
 
-func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-	
-	plugin.Logger(ctx).Trace("listSecurityRule")
+func listPanosSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+
+	plugin.Logger(ctx).Trace("listPanosSecurityRule")
 
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "connection_error", err)
+		plugin.Logger(ctx).Error("panos_security_rule.listPanosSecurityRule", "connection_error", err)
 		return nil, err
 	}
 
@@ -116,7 +117,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id")
+			plugin.Logger(ctx).Debug("panos_security_rule.listPanosSecurityRule", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
@@ -136,7 +137,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id")
+			plugin.Logger(ctx).Debug("panos_security_rule.listPanosSecurityRule", "Panorama.id")
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -150,7 +151,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 
 	// Error handling
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "query_error", err)
+		plugin.Logger(ctx).Error("panos_security_rule.listPanosSecurityRule", "query_error", err)
 		return nil, err
 	}
 

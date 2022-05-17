@@ -1,28 +1,58 @@
 # Table: panos_security_rule
 
-Find list of security rules present in the PAN-OS endpoint.
+Find list of security rules present in the PAN-OS endpoint. Security policies allow you to enforce rules and take action, and can be as general or specific as needed. The policy rules are compared against the incoming traffic in sequence, and because the first rule that matches the traffic is applied, the more specific rules must precede the more general ones.
 
 ## Examples
 
-### Basic info
+### Basic ingress rule info
 
 ```sql
 select
   name,
   type,
-  description,
+  action,
   source_zones,
-  destination_zones
+  source_addresses,
+  destination_zones,
+  destination_addresses
+  source_users
 from
   panos_security_rule;
 ```
 
 ```sh
-+------------+-----------+-------------+----------------+-------------------+
-| name       | type      | description | source_zones   | destination_zones |
-+------------+-----------+-------------+----------------+-------------------+
-| turbot_ccu | universal | test policy | ["zone1"]      | ["zone2"]         |
-+------------+-----------+-------------+----------------+-------------------+
++---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
+| name          | type      | action | source_zones         | source_addresses | destination_zones  | source_users |
++---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
+| test_sec_rule | universal | allow  | ["test_source_zone"] | ["Test Address"] | ["test_dest_zone"] | ["any"]      |
++---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
+```
+
+### List disable security rules
+
+```sql
+select
+  name,
+  type,
+  description
+from
+  panos_security_rule
+where
+  disabled;
+```
+
+### Get security rules count by group
+
+```sql
+select
+  case
+    when group_tag is null then 'none'
+    else group_tag
+  end as group_tag,
+  count(*)
+from
+  panos_security_rule
+group by group_tag;
 ```
 
 ### List of security rules without `application` tag
