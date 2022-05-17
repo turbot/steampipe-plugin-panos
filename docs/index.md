@@ -63,11 +63,17 @@ connection "panos" {
 ```
 
 * `hostname` - The hostname / IP address of PAN-OS.
-* `api_key` - The API key for the firewall.
+* `api_key` - The API key for the PAN-OS endpoint.
+* `username` - The username for the PAN-OS endpoint.
+* `password` - The password for the PAN-OS endpoint.
 
 Environment variables are also available as an alternate configuration method:
 * `PANOS_HOSTNAME`
 * `PANOS_API_KEY`
+* `PANOS_USERNAME`
+* `PANOS_PASSWORD`
+
+> Note: If `api_key` or `PANOS_API_KEY` is used, then `username / PANOS_USERNAME` and `password / PANOS_PASSWORD` are ignored.
 
 ## Get involved
 
