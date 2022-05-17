@@ -13,8 +13,8 @@ import (
 
 func tablePanosTagObject(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
-		Name:        "panos_tag_object",
-		Description: "Tag objects for the PAN-OS device.",
+		Name:        "panos_administrative_tag",
+		Description: "Tag objects for the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
 			Hydrate: listTag,
 			KeyColumns: []*plugin.KeyColumn{
@@ -30,7 +30,7 @@ func tablePanosTagObject(ctx context.Context) *plugin.Table {
 			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
 			{Name: "color", Type: proto.ColumnType_STRING, Description: "The color of the Tag."},
 			{Name: "comment", Type: proto.ColumnType_STRING, Description: "Tag Comment."},
-			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
+			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the tag object."},
 		},
 	}
 }
