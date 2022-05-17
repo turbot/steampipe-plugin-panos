@@ -83,7 +83,7 @@ select
   color,
   comment
 from
-  panos_administrative_tag;
+  panos_administrative_tag
 where
   device_group='group1'
 ```
