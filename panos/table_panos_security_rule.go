@@ -12,6 +12,8 @@ import (
 	"github.com/turbot/steampipe-plugin-sdk/v3/plugin/transform"
 )
 
+//// TABLE DEFINITION
+
 func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_security_rule",
@@ -26,10 +28,14 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			},
 		},
 		Columns: []*plugin.Column{
+			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the rule."},
-			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule."},
+			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule.", Default: "universal"},
+			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Whether this rule is disabled"},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The security rule's description."},
 			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
+			
+			// Other columns
 			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "List of source zones."},
 			{Name: "source_addresses", Type: proto.ColumnType_JSON, Description: "List of source addresses."},
 			{Name: "negate_source", Type: proto.ColumnType_BOOL, Description: "If the source is negated."},
@@ -45,7 +51,6 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			{Name: "log_setting", Type: proto.ColumnType_STRING, Description: "Log forwarding profile."},
 			{Name: "log_start", Type: proto.ColumnType_BOOL, Description: "Log the start of the traffic flow."},
 			{Name: "log_end", Type: proto.ColumnType_BOOL, Description: "Log the end of the traffic flow."},
-			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Whether this rule is disabled"},
 			{Name: "schedule", Type: proto.ColumnType_STRING, Description: "The security rule schedule."},
 			{Name: "icmp_unreachable", Type: proto.ColumnType_BOOL, Description: "Is ICMP unreachable."},
 			{Name: "disable_server_response_inspection", Type: proto.ColumnType_BOOL, Description: "If server response inspection is disabled."},
@@ -77,7 +82,12 @@ type securityRuleStruct struct {
 	security.Entry
 }
 
+//// LIST FUNCTION
+
 func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+	
+	plugin.Logger(ctx).Trace("listSecurityRule")
+
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "connection_error", err)
@@ -86,15 +96,19 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
+
 	var vsys, deviceGroup, name string
 	var listing []security.Entry
 	var entry security.Entry
 
+	// Default to rulebase
+	// Override if passed in quals
 	ruleBase := util.PreRulebase
 	if keyQuals["rule_base"] != nil {
 		ruleBase = keyQuals["rule_base"].GetStringValue()
 	}
 
+	// Additional filters
 	if keyQuals["name"] != nil {
 		name = keyQuals["name"].GetStringValue()
 	}
@@ -102,12 +116,13 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
+			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id")
 
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Policies.Security.Get(vsys, name)
 				listing = []security.Entry{entry}
@@ -123,6 +138,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 			}
 			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id")
 
+			// Filter using name, if passed in qual
 			if name != "" {
 				entry, err = client.Policies.Security.Get(deviceGroup, ruleBase, name)
 				listing = append(listing, entry)
@@ -132,6 +148,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		}
 	}
 
+	// Error handling
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "query_error", err)
 		return nil, err
