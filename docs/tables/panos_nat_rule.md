@@ -60,7 +60,7 @@ from
   panos_nat_rule
 where
   tags is null
-  or not tags ?| array['application'];
+  or not tags ? 'application';
 ```
 
 ### Get NAT rules count by group
@@ -91,5 +91,5 @@ from
   panos_administrative_tag as t
 where
   t.color = 'color4'
-  and r.tags ?| array[t.name]
+  and r.tags ? t.name
 ```
