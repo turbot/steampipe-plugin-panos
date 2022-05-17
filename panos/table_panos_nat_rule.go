@@ -37,7 +37,7 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
 
 			// Other columns
-			{Name: "targets", Type: proto.ColumnType_JSON, Description: "Specifies a map of target definitions."},
+			{Name: "targets", Type: proto.ColumnType_JSON, Description: "A dictionary of target definitions."},
 			{Name: "negate_target", Type: proto.ColumnType_BOOL, Description: "Indicates if instead of applying the rule for the given serial numbers, it is applied to everything except them."},
 			{Name: "group_tag", Type: proto.ColumnType_STRING, Description: "The NAT rule's group tag."},
 			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "The list of source zone(s)."},

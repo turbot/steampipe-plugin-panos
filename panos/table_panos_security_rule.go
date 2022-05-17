@@ -56,7 +56,7 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			{Name: "icmp_unreachable", Type: proto.ColumnType_BOOL, Description: "Is ICMP unreachable."},
 			{Name: "disable_server_response_inspection", Type: proto.ColumnType_BOOL, Description: "If server response inspection is disabled."},
 			{Name: "group_tag", Type: proto.ColumnType_STRING, Description: "The group tag."},
-			{Name: "targets", Type: proto.ColumnType_JSON, Description: "List of Target definitions."},
+			{Name: "targets", Type: proto.ColumnType_JSON, Description: "A dictionary of target definitions."},
 			{Name: "negate_target", Type: proto.ColumnType_BOOL, Description: "Instead of applying the rule for the given serial numbers, it is applied to everything except them."},
 
 			{Name: "group", Type: proto.ColumnType_STRING, Description: "The group profile name."},
