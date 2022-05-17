@@ -1,6 +1,8 @@
 # Table: panos_nat_rule
 
-Network Address Translation (NAT) allows the source or destination IP address to be changed for traffic to transition through a router or gateway.
+NAT policies allow you to specify whether source or destination IP addresses and ports are converted between public and private addresses and ports. For example, private source addresses can be translated to public addresses on traffic sent from an internal (trusted) zone to a public (untrusted) zone. NAT is also supported on virtual wire interfaces.
+
+NAT rules are based on source and destination zones, source and destination addresses, and application service (such as HTTP). Like security policies, NAT policy rules are compared against incoming traffic in sequence, and the first rule that matches the traffic is applied.
 
 ## Examples
 
