@@ -61,12 +61,18 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 		password = ""
 	}
 
+	requestTimeout := 10
+	if panosConfig.Timeout != nil && *panosConfig.Timeout > 0 {
+		requestTimeout = *panosConfig.Timeout
+	}
+
 	conn, err := pango.Connect(
 		pango.Client{
 			Hostname: hostname,
 			ApiKey:   apiKey,
 			Username: username,
 			Password: password,
+			Timeout:  requestTimeout,
 		},
 	)
 
