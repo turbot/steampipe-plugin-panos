@@ -78,15 +78,11 @@ type securityRuleStruct struct {
 }
 
 func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "step", "about to connect")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_security_rule.listSecurityRule", "connection_error", err)
 		return nil, err
 	}
-	plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
@@ -110,10 +106,9 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id", vsys)
+			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.id")
 
 			if name != "" {
-				plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Firewall.name", name)
 				entry, err = client.Policies.Security.Get(vsys, name)
 				listing = []security.Entry{entry}
 			} else {
@@ -126,11 +121,9 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id", deviceGroup)
+			plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.id")
 
 			if name != "" {
-				plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "Panorama.name", name)
-
 				entry, err = client.Policies.Security.Get(deviceGroup, ruleBase, name)
 				listing = append(listing, entry)
 			} else {
@@ -144,10 +137,7 @@ func listSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 		return nil, err
 	}
 
-	plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "len(listing)", len(listing))
-
 	for _, i := range listing {
-		plugin.Logger(ctx).Debug("panos_security_rule.listSecurityRule", "listing.i", i)
 		d.StreamListItem(ctx, securityRuleStruct{vsys, deviceGroup, ruleBase, i})
 	}
 

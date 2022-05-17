@@ -45,15 +45,11 @@ type addressStruct struct {
 }
 
 func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "step", "about to connect")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_address_object.listAddressObject", "connection_error", err)
 		return nil, err
 	}
-	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "conn", conn)
 
 	// URL parameters for all queries
 	keyQuals := d.KeyColumnQuals
@@ -72,10 +68,9 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 			if keyQuals["vsys"] != nil {
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id", vsys)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id")
 
 			if name != "" {
-				plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.name", name)
 				entry, err = client.Objects.Address.Get(vsys, name)
 				listing = []addr.Entry{entry}
 			} else {
@@ -88,13 +83,12 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 			if keyQuals["device_group"] != nil {
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id", deviceGroup)
+			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id")
 
 			if name != "" {
 				entry, err = client.Objects.Address.Get(deviceGroup, name)
 				listing = []addr.Entry{entry}
 			} else {
-				plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.name", name)
 				listing, err = client.Objects.Address.GetAll(deviceGroup)
 			}
 		}
@@ -105,10 +99,7 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 		return nil, err
 	}
 
-	plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "len(listing)", len(listing))
-
 	for _, i := range listing {
-		plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "listing.i", i)
 		d.StreamListItem(ctx, addressStruct{vsys, deviceGroup, i})
 	}
 
