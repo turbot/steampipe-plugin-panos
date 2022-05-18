@@ -20,7 +20,7 @@ from
   panos_security_rule;
 ```
 
-### List disable security rules
+### List disabled security rules
 
 ```sql
 select

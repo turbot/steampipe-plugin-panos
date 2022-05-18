@@ -85,9 +85,6 @@ type natRuleStruct struct {
 //// LIST FUNCTION
 
 func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Trace("listNATRule")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_nat_rule.listNATRule", "connection_error", err)
@@ -107,16 +104,18 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 	// Additional filters
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
+		plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "using name qual", name)
 	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			plugin.Logger(ctx).Debug("panos_nat_rule.listNATRule", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
+				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Firewall.vsys", vsys)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -128,18 +127,21 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		}
 	case *pango.Panorama:
 		{
-			plugin.Logger(ctx).Debug("panos_nat_rule.listNATRule", "Panorama.id")
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
+				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama.device_group", deviceGroup)
 
 			// For Panorama, default set to pre_rulebase.
 			// Override if passed in quals
 			ruleBase = util.PreRulebase
 			if keyQuals["rule_base"] != nil {
+				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama", "using rule_base qual")
 				ruleBase = keyQuals["rule_base"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama.rule_base", ruleBase)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -157,7 +159,6 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 	}
 
 	for _, i := range natRules {
-		plugin.Logger(ctx).Debug("panos_nat_rule.listNATRule", "natRules.i", i)
 		d.StreamListItem(ctx, natRuleStruct{vsys, deviceGroup, ruleBase, i})
 	}
 

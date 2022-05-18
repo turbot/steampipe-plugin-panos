@@ -47,9 +47,6 @@ type tagStruct struct {
 //// LIST FUNCTION
 
 func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Trace("listTag")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "connection_error", err)
@@ -66,16 +63,18 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 	// Additional filter
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
+		plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "using name qual", name)
 	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
+				plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Firewall.vsys", vsys)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -87,11 +86,12 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		}
 	case *pango.Panorama:
 		{
-			plugin.Logger(ctx).Debug("panos_administrative_tag.listTag", "Panorama.id")
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
+				plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Panorama.device_group", deviceGroup)
 
 			// Filter using name, if passed in qual
 			if name != "" {
