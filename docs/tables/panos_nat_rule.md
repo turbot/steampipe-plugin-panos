@@ -6,7 +6,7 @@ NAT rules are based on source and destination zones, source and destination addr
 
 ## Examples
 
-### List disable NAT rules
+### List disabled NAT rules
 
 ```sql
 select
@@ -49,23 +49,7 @@ where
   device_group = 'group1';
 ```
 
-### List of NAT rules without `application` tag
-
-```sql
-select
-  name,
-  uuid,
-  type,
-  disabled,
-  tags
-from
-  panos_nat_rule
-where
-  tags is null
-  or not tags ? 'application';
-```
-
-### Get NAT rules count by group
+### Get count of NAT rules by distinct `group tag`
 
 ```sql
 select
@@ -73,25 +57,23 @@ select
     when group_tag is null then 'none'
     else group_tag
   end as group_tag,
-  count(*)
+  count(*) as count
 from
   panos_nat_rule
 group by group_tag;
 ```
 
-### Lis NAT rules which contain any administrative tag with color yellow
+### List NAT rules which contain any administrative tag with color yellow
 
 ```sql
-select
-  r.name,
-  r.uuid,
-  r.type,
-  t.name,
-  t.color
-from
-  panos_nat_rule as r,
-  panos_administrative_tag as t
-where
-  t.color = 'color4'
-  and r.tags ? t.name
+with yellowtags as (
+  select * 
+  from panos_administrative_tag 
+  where color='color4' -- color4 :: Yellow
+) 
+select * from panos_nat_rule 
+  join yellowtags 
+    on panos_nat_rule.tags ? bluetags.name;
 ```
+
+### List NAT rules from 
