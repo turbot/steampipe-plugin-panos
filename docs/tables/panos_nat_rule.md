@@ -88,7 +88,9 @@ from
 
 ```sql
 select
-  *
+  name,
+  source_zones,
+  destination_zone
 from
   panos_nat_rule
 where
