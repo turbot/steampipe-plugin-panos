@@ -49,9 +49,6 @@ type addressStruct struct {
 //// LIST FUNCTION
 
 func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Trace("listAddressObject")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_address_object.listAddressObject", "connection_error", err)
@@ -68,16 +65,18 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 	// Additional filters
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
+		plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "using name qual", name)
 	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
+				plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "Firewall.vsys", vsys)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -89,11 +88,12 @@ func listAddressObject(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydra
 		}
 	case *pango.Panorama:
 		{
-			plugin.Logger(ctx).Debug("panos_address_object.listAddressObject", "Panorama.id")
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
+				plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
+			plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "Panorama.device_group", deviceGroup)
 
 			// Filter using name, if passed in qual
 			if name != "" {

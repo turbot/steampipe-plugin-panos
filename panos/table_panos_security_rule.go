@@ -107,19 +107,21 @@ func listPanosSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	ruleBase := util.PreRulebase
 	if keyQuals["rule_base"] != nil {
 		ruleBase = keyQuals["rule_base"].GetStringValue()
+		plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "using rule_base qual", name)
 	}
 
 	// Additional filters
 	if keyQuals["name"] != nil {
 		name = keyQuals["name"].GetStringValue()
+		plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "using name qual", name)
 	}
 
 	switch client := conn.(type) {
 	case *pango.Firewall:
 		{
-			plugin.Logger(ctx).Debug("panos_security_rule.listPanosSecurityRule", "Firewall.id")
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
+				plugin.Logger(ctx).Trace("panos_security_rule.listPanosSecurityRule", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
 
@@ -135,9 +137,10 @@ func listPanosSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 		{
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
+				plugin.Logger(ctx).Trace("panos_security_rule.listPanosSecurityRule", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Debug("panos_security_rule.listPanosSecurityRule", "Panorama.id")
+			plugin.Logger(ctx).Trace("panos_security_rule.listPanosSecurityRule", "Panorama.device_group", deviceGroup)
 
 			// Filter using name, if passed in qual
 			if name != "" {
