@@ -84,7 +84,7 @@ func connect(ctx context.Context, d *plugin.QueryData) (interface{}, error) {
 }
 
 func isNotFoundError(err error) bool {
-	return strings.Contains(err.Error(), "Resource not found")
+	return strings.HasSuffix(err.Error(), "not found")
 }
 
 func isAPIKeyDefined(apiKey string) bool {
