@@ -70,10 +70,18 @@ with yellowtags as (
   select * 
   from panos_administrative_tag 
   where color='color4' -- color4 :: Yellow
-) 
+)
 select * from panos_nat_rule 
   join yellowtags 
     on panos_nat_rule.tags ? bluetags.name;
 ```
 
-### List NAT rules from 
+### List NAT rules which move packets between different zones
+```sql
+select 
+  * 
+from 
+  panos_nat_rule 
+where 
+  not (source_zones ? destination_zone)
+```
