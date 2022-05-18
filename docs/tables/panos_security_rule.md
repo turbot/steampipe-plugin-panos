@@ -20,14 +20,6 @@ from
   panos_security_rule;
 ```
 
-```sh
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-| name          | type      | action | source_zones         | source_addresses | destination_zones  | source_users |
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-| test_sec_rule | universal | allow  | ["test_source_zone"] | ["Test Address"] | ["test_dest_zone"] | ["any"]      |
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-```
-
 ### List disable security rules
 
 ```sql
@@ -55,6 +47,33 @@ from
 group by group_tag;
 ```
 
+### List security rules having public access to specific tagged addresses
+
+```sql
+with high_impact_tags as (
+  select
+    name
+  from
+    panos_administrative_tag
+  where
+    color = 'color1' -- red
+),
+address_with_high_impact_tags as (
+  select
+    a.name
+  from
+    panos_address_object as a
+    join high_impact_tags as t on a.tags ? t.name
+)
+select
+  r.name,
+  r.source_addresses,
+  r.destination_addresses
+from
+  panos_security_rule as r
+  join address_with_high_impact_tags as ht on r.source_addresses ? 'any' and r.destination_addresses ? ht.name;
+```
+
 ### List of security rules without `application` tag
 
 ```sql
@@ -67,22 +86,25 @@ select
 from
   panos_security_rule
 where
-  tags is null
-  or not tags ? 'application';
+  not tags ? 'application';
 ```
 
 ### Lis security rules which contain any administrative tag with color yellow
 
 ```sql
+with yellow_tags as (
+  select
+    name
+  from
+    panos_administrative_tag
+  where
+    color = 'color4' -- yellow
+)
 select
-  r.name,
-  r.type,
-  t.name,
-  t.color
+  panos_security_rule.name,
+  panos_security_rule.type,
+  panos_security_rule.description
 from
-  panos_security_rule as r,
-  panos_administrative_tag as t
-where
-  t.color = 'color4'
-  and r.tags ? t.name;
+  panos_security_rule
+  join yellow_tags on panos_security_rule.tags ? yellow_tags.name;
 ```

@@ -61,8 +61,7 @@ select
 from
   panos_nat_rule
 where
-  tags is null
-  or not tags ? 'application';
+  not tags ? 'application';
 ```
 
 ### Get NAT rules count by group
