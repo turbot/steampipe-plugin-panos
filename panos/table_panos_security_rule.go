@@ -31,46 +31,46 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			// Top columns
 			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the rule."},
 			{Name: "uuid", Type: proto.ColumnType_STRING, Transform: transform.FromField("Uuid"), Description: "The PAN-OS UUID."},
-			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule.", Default: "universal"},
-			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Whether this rule is disabled"},
+			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of security rule. Default sets to universal. Other possibles values are: interzone, or intrazone.", Default: "universal"},
+			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Indicates whether this rule is disabled."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The security rule's description."},
-			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
+			{Name: "tags", Type: proto.ColumnType_JSON, Description: "A list of administrative tags assigned to the rule."},
 
 			// Other columns
-			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "List of source zones."},
-			{Name: "source_addresses", Type: proto.ColumnType_JSON, Description: "List of source addresses."},
-			{Name: "negate_source", Type: proto.ColumnType_BOOL, Description: "If the source is negated."},
-			{Name: "source_users", Type: proto.ColumnType_JSON, Description: "List of source users."},
-			{Name: "hip_profiles", Type: proto.ColumnType_JSON, Description: "List of HIP profiles."},
-			{Name: "destination_zones", Type: proto.ColumnType_JSON, Description: "List of destination zones."},
-			{Name: "destination_addresses", Type: proto.ColumnType_JSON, Description: "List of destination addresses."},
-			{Name: "negate_destination", Type: proto.ColumnType_BOOL, Description: "If the destination is negated."},
-			{Name: "applications", Type: proto.ColumnType_JSON, Description: "List of applications."},
-			{Name: "services", Type: proto.ColumnType_JSON, Description: "List of services."},
-			{Name: "categories", Type: proto.ColumnType_JSON, Description: "List of categories."},
-			{Name: "action", Type: proto.ColumnType_STRING, Description: "Action for the matched traffic."},
+			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "A list of source zones."},
+			{Name: "source_addresses", Type: proto.ColumnType_JSON, Description: "A list of source addresses."},
+			{Name: "negate_source", Type: proto.ColumnType_BOOL, Description: "Indicates if the source is negated."},
+			{Name: "source_users", Type: proto.ColumnType_JSON, Description: "A list of source users."},
+			{Name: "hip_profiles", Type: proto.ColumnType_JSON, Description: "A list of HIP profiles."},
+			{Name: "destination_zones", Type: proto.ColumnType_JSON, Description: "A list of destination zones."},
+			{Name: "destination_addresses", Type: proto.ColumnType_JSON, Description: "A list of destination addresses."},
+			{Name: "negate_destination", Type: proto.ColumnType_BOOL, Description: "Indicates if the destination is negated."},
+			{Name: "applications", Type: proto.ColumnType_JSON, Description: "A list of applications."},
+			{Name: "services", Type: proto.ColumnType_JSON, Description: "A list of services."},
+			{Name: "categories", Type: proto.ColumnType_JSON, Description: "A list of categories."},
+			{Name: "action", Type: proto.ColumnType_STRING, Description: "Specifies the action for the matched traffic. Possible values are: allow (default), deny, drop, reset-client, reset-server, or reset-both."},
 			{Name: "log_setting", Type: proto.ColumnType_STRING, Description: "Log forwarding profile."},
 			{Name: "log_start", Type: proto.ColumnType_BOOL, Description: "Log the start of the traffic flow."},
 			{Name: "log_end", Type: proto.ColumnType_BOOL, Description: "Log the end of the traffic flow."},
 			{Name: "schedule", Type: proto.ColumnType_STRING, Description: "The security rule schedule."},
-			{Name: "icmp_unreachable", Type: proto.ColumnType_BOOL, Description: "Is ICMP unreachable."},
-			{Name: "disable_server_response_inspection", Type: proto.ColumnType_BOOL, Description: "If server response inspection is disabled."},
-			{Name: "group_tag", Type: proto.ColumnType_STRING, Description: "The group tag."},
+			{Name: "icmp_unreachable", Type: proto.ColumnType_BOOL, Description: "Indicates whether ICMP is unreachable."},
+			{Name: "disable_server_response_inspection", Type: proto.ColumnType_BOOL, Description: "Indicates if server response inspection is disabled."},
+			{Name: "group_tag", Type: proto.ColumnType_STRING, Description: "Specifies the group tag assigned to this rule."},
 			{Name: "targets", Type: proto.ColumnType_JSON, Description: "A dictionary of target definitions."},
 			{Name: "negate_target", Type: proto.ColumnType_BOOL, Description: "Instead of applying the rule for the given serial numbers, it is applied to everything except them."},
 
 			{Name: "group", Type: proto.ColumnType_STRING, Description: "The group profile name."},
 			{Name: "virus", Type: proto.ColumnType_STRING, Description: "The antivirus setting."},
 			{Name: "spyware", Type: proto.ColumnType_STRING, Description: "The anti-spyware setting."},
-			{Name: "vulnerability", Type: proto.ColumnType_STRING, Description: "The Vulnerability Protection setting."},
+			{Name: "vulnerability", Type: proto.ColumnType_STRING, Description: "The vulnerability protection setting."},
 			{Name: "url_filtering", Type: proto.ColumnType_STRING, Transform: transform.FromField("UrlFiltering").NullIfZero(), Description: "The URL filtering setting."},
 			{Name: "file_blocking", Type: proto.ColumnType_STRING, Description: "The file blocking setting."},
-			{Name: "wild_fire_analysis", Type: proto.ColumnType_STRING, Description: "The WildFire Analysis setting."},
-			{Name: "data_filtering", Type: proto.ColumnType_STRING, Description: "The Data Filtering setting."},
+			{Name: "wild_fire_analysis", Type: proto.ColumnType_STRING, Description: "The wildfire analysis setting."},
+			{Name: "data_filtering", Type: proto.ColumnType_STRING, Description: "The data filtering setting."},
 
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the security rule belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
-			{Name: "rule_base", Type: proto.ColumnType_STRING, Transform: transform.FromField("RuleBase").NullIfZero(), Description: "[Panorama] The rulebase. This can be either pre-rulebase (default for panorama), rulebase, or post-rulebase."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)."},
+			{Name: "rule_base", Type: proto.ColumnType_STRING, Description: "[Panorama] The rulebase. This can be either pre-rulebase (default for panorama), rulebase, or post-rulebase."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the security rule."},
 		},
 	}
@@ -86,9 +86,6 @@ type securityRuleStruct struct {
 //// LIST FUNCTION
 
 func listPanosSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
-
-	plugin.Logger(ctx).Trace("listPanosSecurityRule")
-
 	conn, err := connect(ctx, d)
 	if err != nil {
 		plugin.Logger(ctx).Error("panos_security_rule.listPanosSecurityRule", "connection_error", err)

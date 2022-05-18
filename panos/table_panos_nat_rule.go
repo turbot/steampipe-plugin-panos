@@ -19,7 +19,7 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 		Name:        "panos_nat_rule",
 		Description: "NAT rules for the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
-			Hydrate: listNATRule,
+			Hydrate: listPanosNATRule,
 			KeyColumns: []*plugin.KeyColumn{
 				{Name: "vsys", Require: plugin.Optional},
 				{Name: "device_group", Require: plugin.Optional},
@@ -34,13 +34,13 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 			{Name: "type", Type: proto.ColumnType_STRING, Description: "The type of NAT rule. Possible values are: ipv4 (default), nat64, or nptv6.", Default: "ipv4"},
 			{Name: "disabled", Type: proto.ColumnType_BOOL, Description: "Indicates if a rule is disabled, or not."},
 			{Name: "description", Type: proto.ColumnType_STRING, Description: "The NAT rule's description."},
-			{Name: "tags", Type: proto.ColumnType_JSON, Description: "List of administrative tags."},
+			{Name: "tags", Type: proto.ColumnType_JSON, Description: "A list of administrative tags assigned to the rule."},
 
 			// Other columns
 			{Name: "targets", Type: proto.ColumnType_JSON, Description: "A dictionary of target definitions."},
 			{Name: "negate_target", Type: proto.ColumnType_BOOL, Description: "Indicates if instead of applying the rule for the given serial numbers, it is applied to everything except them."},
 			{Name: "group_tag", Type: proto.ColumnType_STRING, Description: "The NAT rule's group tag."},
-			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "The list of source zone(s)."},
+			{Name: "source_zones", Type: proto.ColumnType_JSON, Description: "A list of source zone(s)."},
 			{Name: "destination_zone", Type: proto.ColumnType_STRING, Description: "The NAT rule's destination zone."},
 			{Name: "to_interface", Type: proto.ColumnType_STRING, Description: "Egress interface from route lookup (default: any)."},
 			{Name: "service", Type: proto.ColumnType_STRING, Description: "Specifies the service (default: any)."},
@@ -48,7 +48,7 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 			{Name: "destination_addresses", Type: proto.ColumnType_JSON, Description: "A list of destination address."},
 
 			// Source Address Translation (SAT) config
-			{Name: "sat_type", Type: proto.ColumnType_STRING, Description: "Type of source address translation. Possible values are: none (default), dynamic-ip-and-port, dynamic-ip, or static-ip."},
+			{Name: "sat_type", Type: proto.ColumnType_STRING, Description: "Specifies the type of source address translation. Possible values are: none (default), dynamic-ip-and-port, dynamic-ip, or static-ip."},
 			{Name: "sat_address_type", Type: proto.ColumnType_STRING, Description: "Source address translation address type. Possible values are: interface-address or translated-address."},
 			{Name: "sat_translated_addresses", Type: proto.ColumnType_JSON, Description: "A list of translated address."},
 			{Name: "sat_interface", Type: proto.ColumnType_STRING, Description: "Describes the source address translation interface."},
@@ -67,9 +67,9 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 			{Name: "dat_port", Type: proto.ColumnType_INT, Description: "Specifies the destination address port."},
 			{Name: "dat_dynamic_distribution", Type: proto.ColumnType_STRING, Description: "Specifies the distribution algorithm for destination address pool."},
 
-			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "The vsys to put the NAT rule into (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "The device group location (default: shared)."},
-			{Name: "rule_base", Type: proto.ColumnType_STRING, Description: "The rulebase. For firewalls, there is only the rulebase value (default), but on Panorama, there is also pre-rulebase and post-rulebase."},
+			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys to put the NAT rule into (default: vsys1)."},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)."},
+			{Name: "rule_base", Type: proto.ColumnType_STRING, Description: "[Panorama] The rulebase. For firewalls, there is only the rulebase value (default), but on Panorama, there is also pre-rulebase and post-rulebase."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the NAT rule."},
 		},
 	}
@@ -84,10 +84,10 @@ type natRuleStruct struct {
 
 //// LIST FUNCTION
 
-func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listPanosNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_nat_rule.listNATRule", "connection_error", err)
+		plugin.Logger(ctx).Error("panos_nat_rule.listPanosNATRule", "connection_error", err)
 		return nil, err
 	}
 
@@ -112,10 +112,10 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		{
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
-				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Firewall", "using vsys qual")
+				plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Firewall.vsys", vsys)
+			plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Firewall.vsys", vsys)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -129,19 +129,19 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 		{
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
-				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama", "using device_group qual")
+				plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama.device_group", deviceGroup)
+			plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Panorama.device_group", deviceGroup)
 
 			// For Panorama, default set to pre_rulebase.
 			// Override if passed in quals
 			ruleBase = util.PreRulebase
 			if keyQuals["rule_base"] != nil {
-				plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama", "using rule_base qual")
+				plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Panorama", "using rule_base qual")
 				ruleBase = keyQuals["rule_base"].GetStringValue()
 			}
-			plugin.Logger(ctx).Trace("panos_nat_rule.listNATRule", "Panorama.rule_base", ruleBase)
+			plugin.Logger(ctx).Trace("panos_nat_rule.listPanosNATRule", "Panorama.rule_base", ruleBase)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -154,7 +154,7 @@ func listNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData
 	}
 
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_nat_rule.listNATRule", "query_error", err)
+		plugin.Logger(ctx).Error("panos_nat_rule.listPanosNATRule", "query_error", err)
 		return nil, err
 	}
 

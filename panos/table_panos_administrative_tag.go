@@ -13,12 +13,12 @@ import (
 
 //// TABLE DEFINITION
 
-func tablePanosTagObject(ctx context.Context) *plugin.Table {
+func tablePanosAdministrativeTag(ctx context.Context) *plugin.Table {
 	return &plugin.Table{
 		Name:        "panos_administrative_tag",
 		Description: "Tag objects in the PAN-OS endpoint.",
 		List: &plugin.ListConfig{
-			Hydrate: listTag,
+			Hydrate: listPanosAdministrativeTag,
 			KeyColumns: []*plugin.KeyColumn{
 				{Name: "vsys", Require: plugin.Optional},
 				{Name: "device_group", Require: plugin.Optional},
@@ -27,12 +27,12 @@ func tablePanosTagObject(ctx context.Context) *plugin.Table {
 		},
 		Columns: []*plugin.Column{
 			// Top columns
-			{Name: "name", Type: proto.ColumnType_STRING, Description: "Name of the tag."},
-			{Name: "color", Type: proto.ColumnType_STRING, Description: "Color ID."},
-			{Name: "comment", Type: proto.ColumnType_STRING, Description: "Comments."},
+			{Name: "name", Type: proto.ColumnType_STRING, Description: "An unique identifier of the tag."},
+			{Name: "color", Type: proto.ColumnType_STRING, Description: "Specifies the color ID for the tag."},
+			{Name: "comment", Type: proto.ColumnType_STRING, Description: "Specifies a label or description to describe for what the tag is used."},
 
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the address object belongs to (default: vsys1)."},
-			{Name: "device_group", Type: proto.ColumnType_STRING, Transform: transform.FromField("DeviceGroup").NullIfZero(), Description: "[Panorama] The device group location (default: shared)"},
+			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)."},
 			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the tag object."},
 		},
 	}
@@ -46,10 +46,10 @@ type tagStruct struct {
 
 //// LIST FUNCTION
 
-func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
+func listPanosAdministrativeTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (interface{}, error) {
 	conn, err := connect(ctx, d)
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "connection_error", err)
+		plugin.Logger(ctx).Error("panos_administrative_tag.listPanosAdministrativeTag", "connection_error", err)
 		return nil, err
 	}
 
@@ -63,7 +63,7 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 	// Additional filter
 	if d.KeyColumnQuals["name"] != nil {
 		name = d.KeyColumnQuals["name"].GetStringValue()
-		plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "using name qual", name)
+		plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "using name qual", name)
 	}
 
 	switch client := conn.(type) {
@@ -71,10 +71,10 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		{
 			vsys = "vsys1"
 			if keyQuals["vsys"] != nil {
-				plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Firewall", "using vsys qual")
+				plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "Firewall", "using vsys qual")
 				vsys = keyQuals["vsys"].GetStringValue()
 			}
-			plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Firewall.vsys", vsys)
+			plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "Firewall.vsys", vsys)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -88,10 +88,10 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 		{
 			deviceGroup = "shared"
 			if keyQuals["device_group"] != nil {
-				plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Panorama", "using device_group qual")
+				plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "Panorama", "using device_group qual")
 				deviceGroup = keyQuals["device_group"].GetStringValue()
 			}
-			plugin.Logger(ctx).Trace("panos_administrative_tag.listTag", "Panorama.device_group", deviceGroup)
+			plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "Panorama.device_group", deviceGroup)
 
 			// Filter using name, if passed in qual
 			if name != "" {
@@ -104,7 +104,7 @@ func listTag(ctx context.Context, d *plugin.QueryData, _ *plugin.HydrateData) (i
 	}
 
 	if err != nil {
-		plugin.Logger(ctx).Error("panos_administrative_tag.listTag", "query_error", err)
+		plugin.Logger(ctx).Error("panos_administrative_tag.listPanosAdministrativeTag", "query_error", err)
 		return nil, err
 	}
 
