@@ -20,15 +20,7 @@ from
   panos_security_rule;
 ```
 
-```sh
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-| name          | type      | action | source_zones         | source_addresses | destination_zones  | source_users |
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-| test_sec_rule | universal | allow  | ["test_source_zone"] | ["Test Address"] | ["test_dest_zone"] | ["any"]      |
-+---------------+-----------+--------+----------------------+------------------+--------------------+--------------+
-```
-
-### List disable security rules
+### List disabled security rules
 
 ```sql
 select
