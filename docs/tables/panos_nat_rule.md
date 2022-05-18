@@ -85,3 +85,16 @@ from
 where 
   not (source_zones ? destination_zone)
 ```
+
+### List NAT rules which translate to unknown addresses
+```sql
+select 
+  name,
+  dat_address 
+from 
+  panos_nat_rule 
+where 
+  dat_address not in (
+    select name from panos_address_object
+  )
+```
