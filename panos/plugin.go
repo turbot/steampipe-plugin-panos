@@ -19,8 +19,10 @@ func Plugin(ctx context.Context) *plugin.Plugin {
 			ShouldIgnoreError: isNotFoundError,
 		},
 		TableMap: map[string]*plugin.Table{
-			"panos_address_object": tablePanosAddressObject(ctx),
-			"panos_security_rule":  tablePanosSecurityRule(ctx),
+			"panos_address_object":     tablePanosAddressObject(ctx),
+			"panos_administrative_tag": tablePanosAdministrativeTag(ctx),
+			"panos_nat_rule":           tablePanosNATRule(ctx),
+			"panos_security_rule":      tablePanosSecurityRule(ctx),
 		},
 	}
 	return p

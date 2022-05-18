@@ -17,6 +17,7 @@ og_image: "/images/plugins/turbot/panos-social-graphic.png"
 [PAN-OS](https://docs.paloaltonetworks.com/pan-os) is the operating system for Palo Alto Networks NGFWs and Panorama.
 
 Example query:
+
 ```sql
 select
   name,
@@ -24,11 +25,10 @@ select
   description
 from
   panos_address_object
-order by
-  name
+order by name;
 ```
 
-```
+```sh
 +----------+-----------------+-------------------------+
 | name     | value           | description             |
 +----------+-----------------+-------------------------+
@@ -56,20 +56,34 @@ Installing the latest panos plugin will create a config file (`~/.steampipe/conf
 
 ```hcl
 connection "panos" {
-  plugin   = "panos"
-  hostname = "127.0.0.1"
-  api_key  = "secret"
+  plugin = "panos"
+  
+  # hostname to connect to 
+  # hostname = "127.0.0.1"
+  
+  # api key to use for connection
+  # api_key = "secret"
+  
+  # Username/Password combination to use for the connection. Ignored if 'api_key' is set
+  # username = "username"
+  # password = "password"
+  
+  # Request timeout (in seconds) for calls to the endpoint. Defaults to 10. Increase this if the endpoint may return
+  # a high number of resources
+  # timeout = 10
 }
 ```
 
-* `hostname` - The hostname / IP address of PAN-OS.
-* `api_key` - The API key for the firewall.
-
 Environment variables are also available as an alternate configuration method:
-* `PANOS_HOSTNAME`
-* `PANOS_API_KEY`
+
+- `PANOS_HOSTNAME`
+- `PANOS_API_KEY`
+- `PANOS_USERNAME`
+- `PANOS_PASSWORD`
+
+> Note: If `api_key` or `PANOS_API_KEY` is used, then `username / PANOS_USERNAME` and `password / PANOS_PASSWORD` are ignored.
 
 ## Get involved
 
-* Open source: https://github.com/turbot/steampipe-plugin-panos
-* Community: [Slack Channel](https://steampipe.io/community/join)
+- Open source: https://github.com/turbot/steampipe-plugin-panos
+- Community: [Slack Channel](https://steampipe.io/community/join)
