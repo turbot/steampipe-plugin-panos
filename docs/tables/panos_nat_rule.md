@@ -60,41 +60,51 @@ select
   count(*) as count
 from
   panos_nat_rule
-group by group_tag;
+group by
+  group_tag;
 ```
 
 ### List NAT rules which contain any administrative tag with color yellow
 
 ```sql
-with yellowtags as (
-  select * 
-  from panos_administrative_tag 
-  where color='color4' -- color4 :: Yellow
+with yellow_tags as (
+  select
+    name
+  from
+    panos_administrative_tag
+  where
+    color='color4' -- color4 :: Yellow
 )
-select * from panos_nat_rule 
-  join yellowtags 
-    on panos_nat_rule.tags ? bluetags.name;
+select
+  panos_nat_rule.name,
+  panos_nat_rule.type,
+  panos_nat_rule.description
+from
+  panos_nat_rule
+  join yellow_tags on panos_nat_rule.tags ? yellow_tags.name;
 ```
 
 ### List NAT rules which move packets between different zones
+
 ```sql
-select 
-  * 
-from 
-  panos_nat_rule 
-where 
-  not (source_zones ? destination_zone)
+select
+  *
+from
+  panos_nat_rule
+where
+  not (source_zones ? destination_zone);
 ```
 
 ### List NAT rules which translate to unknown addresses
+
 ```sql
-select 
+select
   name,
-  dat_address 
-from 
-  panos_nat_rule 
-where 
+  dat_address
+from
+  panos_nat_rule
+where
   dat_address not in (
     select name from panos_address_object
-  )
+  );
 ```

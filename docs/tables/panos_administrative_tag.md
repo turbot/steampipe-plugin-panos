@@ -29,9 +29,9 @@ select
   color,
   comment
 from
-  panos_administrative_tag;
+  panos_administrative_tag
 where
-  color = 'color4'
+  color = 'color4';
 ```
 
 ### List administrative tags for a specific `vsys`
@@ -42,9 +42,9 @@ select
   color,
   comment
 from
-  panos_administrative_tag;
+  panos_administrative_tag
 where
-  vsys = 'vsys1'
+  vsys = 'vsys1';
 ```
 
 ### List administrative tags for a **Panorama** `device group`
@@ -57,5 +57,5 @@ select
 from
   panos_administrative_tag
 where
-  device_group = 'group1'
+  device_group = 'group1';
 ```

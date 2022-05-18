@@ -24,5 +24,6 @@ select
   description
 from
   panos_address_object;
-order by name;
+order by
+  name;
 ```

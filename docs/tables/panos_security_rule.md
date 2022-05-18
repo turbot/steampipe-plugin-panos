@@ -44,7 +44,8 @@ select
   count(*)
 from
   panos_security_rule
-group by group_tag;
+group by
+  group_tag;
 ```
 
 ### List security rules having public access to specific tagged addresses
@@ -98,7 +99,7 @@ with yellow_tags as (
   from
     panos_administrative_tag
   where
-    color = 'color4' -- yellow
+    color = 'color4'; -- yellow
 )
 select
   panos_security_rule.name,
