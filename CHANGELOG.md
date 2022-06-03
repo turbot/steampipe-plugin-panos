@@ -1,3 +1,9 @@
+## v0.0.2 [2022-06-03]
+
+_Breaking changes_
+
+- Removed the column `raw` from all tables since the data included in the column was redundant. ([#6](https://github.com/turbot/steampipe-plugin-panos/pull/6))
+
 ## v0.0.1 [2022-05-18]
 
 _What's new?_
