@@ -70,7 +70,6 @@ func tablePanosNATRule(ctx context.Context) *plugin.Table {
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys to put the NAT rule into (default: vsys1)."},
 			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)."},
 			{Name: "rule_base", Type: proto.ColumnType_STRING, Description: "[Panorama] The rulebase. For firewalls, there is only the rulebase value (default), but on Panorama, there is also pre-rulebase and post-rulebase."},
-			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the NAT rule."},
 		},
 	}
 }

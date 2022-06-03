@@ -35,7 +35,6 @@ func tablePanosAddressObject(ctx context.Context) *plugin.Table {
 
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "The vsys the address object belongs to (default: vsys1)."},
 			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "The device group location (default: shared)."},
-			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the address object."},
 		},
 	}
 }

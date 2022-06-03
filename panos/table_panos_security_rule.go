@@ -71,7 +71,6 @@ func tablePanosSecurityRule(ctx context.Context) *plugin.Table {
 			{Name: "vsys", Type: proto.ColumnType_STRING, Transform: transform.FromField("VSys").NullIfZero(), Description: "[NGFW] The vsys the security rule belongs to (default: vsys1)."},
 			{Name: "device_group", Type: proto.ColumnType_STRING, Description: "[Panorama] The device group location (default: shared)."},
 			{Name: "rule_base", Type: proto.ColumnType_STRING, Description: "[Panorama] The rulebase. This can be either pre-rulebase (default for panorama), rulebase, or post-rulebase."},
-			{Name: "raw", Type: proto.ColumnType_JSON, Transform: transform.FromValue(), Description: "Raw view of data for the security rule."},
 		},
 	}
 }
