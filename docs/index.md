@@ -1,6 +1,6 @@
 ---
 organization: Turbot
-category: ["network"]
+category: ["security"]
 icon_url: "/images/plugins/turbot/panos.svg"
 brand_color: "#FA582D"
 display_name: PAN-OS
