@@ -2,7 +2,7 @@
 
 _Bug fixes_
 
-- Updated the plugin category from `network` to `security`. ([#9](https://github.com/turbot/steampipe-plugin-panos/pull/10))
+- Updated the plugin category from `network` to `security`. ([#10](https://github.com/turbot/steampipe-plugin-panos/pull/10))
 
 ## v0.0.2 [2022-06-03]
 
