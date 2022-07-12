@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/PaloAltoNetworks/pango v0.8.0
-	github.com/turbot/steampipe-plugin-sdk/v3 v3.3.1
+	github.com/turbot/steampipe-plugin-sdk/v3 v3.3.2
 )
 
 require (
