@@ -6,9 +6,9 @@ import (
 	"github.com/PaloAltoNetworks/pango"
 	"github.com/PaloAltoNetworks/pango/objs/tags"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 //// TABLE DEFINITION
@@ -53,15 +53,15 @@ func listPanosAdministrativeTag(ctx context.Context, d *plugin.QueryData, _ *plu
 	}
 
 	// URL parameters for all queries
-	keyQuals := d.KeyColumnQuals
+	keyQuals := d.EqualsQuals
 
 	var vsys, deviceGroup, name string
 	var listing []tags.Entry
 	var entry tags.Entry
 
 	// Additional filter
-	if d.KeyColumnQuals["name"] != nil {
-		name = d.KeyColumnQuals["name"].GetStringValue()
+	if d.EqualsQuals["name"] != nil {
+		name = d.EqualsQuals["name"].GetStringValue()
 		plugin.Logger(ctx).Trace("panos_administrative_tag.listPanosAdministrativeTag", "using name qual", name)
 	}
 
