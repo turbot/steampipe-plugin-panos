@@ -7,9 +7,9 @@ import (
 	"github.com/PaloAltoNetworks/pango/poli/nat"
 	"github.com/PaloAltoNetworks/pango/util"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 //// TABLE DEFINITION
@@ -91,7 +91,7 @@ func listPanosNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 	}
 
 	// URL parameters for all queries
-	keyQuals := d.KeyColumnQuals
+	keyQuals := d.EqualsQuals
 
 	var vsys, deviceGroup, name string
 	var natRules []nat.Entry
@@ -101,8 +101,8 @@ func listPanosNATRule(ctx context.Context, d *plugin.QueryData, _ *plugin.Hydrat
 	ruleBase := util.Rulebase
 
 	// Additional filters
-	if d.KeyColumnQuals["name"] != nil {
-		name = d.KeyColumnQuals["name"].GetStringValue()
+	if d.EqualsQuals["name"] != nil {
+		name = d.EqualsQuals["name"].GetStringValue()
 		plugin.Logger(ctx).Trace("panos_address_object.listAddressObject", "using name qual", name)
 	}
 

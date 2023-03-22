@@ -7,9 +7,9 @@ import (
 	"github.com/PaloAltoNetworks/pango/poli/security"
 	"github.com/PaloAltoNetworks/pango/util"
 
-	"github.com/turbot/steampipe-plugin-sdk/v4/grpc/proto"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v4/plugin/transform"
+	"github.com/turbot/steampipe-plugin-sdk/v5/grpc/proto"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
+	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/transform"
 )
 
 //// TABLE DEFINITION
@@ -92,7 +92,7 @@ func listPanosSecurityRule(ctx context.Context, d *plugin.QueryData, _ *plugin.H
 	}
 
 	// URL parameters for all queries
-	keyQuals := d.KeyColumnQuals
+	keyQuals := d.EqualsQuals
 
 	var vsys, deviceGroup, name string
 	var listing []security.Entry
