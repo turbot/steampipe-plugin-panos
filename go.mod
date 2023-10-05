@@ -3,7 +3,7 @@ module github.com/turbot/steampipe-plugin-panos
 go 1.21
 
 require (
-	github.com/PaloAltoNetworks/pango v0.8.0
+	github.com/PaloAltoNetworks/pango v0.10.2
 	github.com/turbot/steampipe-plugin-sdk/v5 v5.6.2
 )
 
