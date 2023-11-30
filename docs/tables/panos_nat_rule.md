@@ -1,12 +1,20 @@
-# Table: panos_nat_rule
+---
+title: "Steampipe Table: panos_nat_rule - Query Palo Alto Networks NAT Rules using SQL"
+description: "Allows users to query Network Address Translation (NAT) Rules in Palo Alto Networks, providing insights into rule configurations, source and destination interfaces, and translation types."
+---
 
-NAT policies allow you to specify whether source or destination IP addresses and ports are converted between public and private addresses and ports. For example, private source addresses can be translated to public addresses on traffic sent from an internal (trusted) zone to a public (untrusted) zone. NAT is also supported on virtual wire interfaces.
+# Table: panos_nat_rule - Query Palo Alto Networks NAT Rules using SQL
 
-NAT rules are based on source and destination zones, source and destination addresses, and application service (such as HTTP). Like security policies, NAT policy rules are compared against incoming traffic in sequence, and the first rule that matches the traffic is applied.
+A Network Address Translation (NAT) Rule in Palo Alto Networks is a policy that specifies how to translate the source and destination IP addresses of packets as they traverse through a device. These rules are essential for directing traffic correctly through firewalls and other network devices. They provide a means of modifying network address information in packet headers while in transit across a traffic routing device.
+
+## Table Usage Guide
+
+The `panos_nat_rule` table provides insights into NAT rules within Palo Alto Networks. As a network administrator, explore rule-specific details through this table, including source and destination interfaces, translation types, and associated metadata. Utilize it to gain a comprehensive understanding of your network's traffic routing and to ensure the correct configuration of your NAT rules.
 
 ## Examples
 
 ### List disabled NAT rules
+Discover the segments that consist of disabled NAT rules. This can help you identify potential security loopholes in your network, thereby enhancing its safety and efficiency.
 
 ```sql
 select
@@ -20,6 +28,7 @@ where
 ```
 
 ### List NAT rules for a specific `vsys`
+Explore the configuration of Network Address Translation (NAT) rules for a specific virtual system. This would be particularly useful for network administrators seeking to understand and manage the routing of network traffic within their system.
 
 ```sql
 select
@@ -35,6 +44,7 @@ where
 ```
 
 ### List NAT rules for a **Panorama** device group
+Explore which NAT rules are active for a particular device group in a Panorama setup. This can help in identifying potential security risks or troubleshooting network issues.
 
 ```sql
 select
@@ -50,6 +60,7 @@ where
 ```
 
 ### Get count of NAT rules by distinct `group tag`
+Identify the number of Network Address Translation (NAT) rules associated with each unique group tag. This can be useful for monitoring and managing network traffic routing configurations.
 
 ```sql
 select
@@ -65,6 +76,7 @@ group by
 ```
 
 ### List NAT rules which contain any administrative tag with color yellow
+Explore which NAT rules are tagged with an administrative marker of yellow color. This is useful for identifying specific configurations that may require attention or follow a certain administrative pattern.
 
 ```sql
 with yellow_tags as (
@@ -85,6 +97,7 @@ from
 ```
 
 ### List NAT rules which move packets between different zones
+Uncover the details of NAT rules that facilitate packet transitions between distinct zones. This is useful in network management to identify potential areas of data flow and troubleshoot connectivity issues.
 
 ```sql
 select
@@ -98,6 +111,7 @@ where
 ```
 
 ### List NAT rules which translate to unknown addresses
+Determine the areas in which Network Address Translation (NAT) rules are translating to unidentified addresses. This is useful for identifying potential misconfigurations or security risks within your network infrastructure.
 
 ```sql
 select
