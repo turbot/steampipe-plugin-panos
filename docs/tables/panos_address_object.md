@@ -1,15 +1,15 @@
 ---
-title: "Steampipe Table: panos_address_object - Query OCI Panorama Address Objects using SQL"
+title: "Steampipe Table: panos_address_object - Query Panorama Address Objects using SQL"
 description: "Allows users to query Panorama Address Objects, specifically the details of each address object, providing insights into network configurations."
 ---
 
-# Table: panos_address_object - Query OCI Panorama Address Objects using SQL
+# Table: panos_address_object - Query Panorama Address Objects using SQL
 
-A Panorama Address Object in OCI is a resource that represents an IP address, IP address range, or FQDN that you can use anywhere in a policy for source or destination address. It provides a way to group multiple IP addresses or FQDNs under a single name to streamline policy creation and management. These objects can be used to configure security policies and NAT rules in Panorama.
+A Panorama Address Object in is a resource that represents an IP address, IP address range, or FQDN that you can use anywhere in a policy for source or destination address. It provides a way to group multiple IP addresses or FQDNs under a single name to streamline policy creation and management. These objects can be used to configure security policies and NAT rules in Panorama.
 
 ## Table Usage Guide
 
-The `panos_address_object` table provides insights into address objects within OCI Panorama. As a network engineer, explore object-specific details through this table, including IP addresses, FQDNs, and associated descriptions. Utilize it to uncover information about objects, such as those with specific IP ranges, the association of multiple IPs under a single name, and the verification of policy configurations.
+The `panos_address_object` table provides insights into address objects within Panorama. As a network engineer, explore object-specific details through this table, including IP addresses, FQDNs, and associated descriptions. Utilize it to uncover information about objects, such as those with specific IP ranges, the association of multiple IPs under a single name, and the verification of policy configurations.
 
 ## Examples
 

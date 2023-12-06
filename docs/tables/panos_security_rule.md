@@ -1,15 +1,15 @@
 ---
-title: "Steampipe Table: panos_security_rule - Query OCI Panorama Security Rules using SQL"
+title: "Steampipe Table: panos_security_rule - Query Panorama Security Rules using SQL"
 description: "Allows users to query Panorama Security Rules, specifically the rules that control network access by defining the source and destination addresses, application, and action (allow, deny, or drop)."
 ---
 
-# Table: panos_security_rule - Query OCI Panorama Security Rules using SQL
+# Table: panos_security_rule - Query Panorama Security Rules using SQL
 
-Panorama Security Rules are a feature within Oracle Cloud Infrastructure (OCI) that control network access by defining the source and destination addresses, application, and action (allow, deny, or drop). These rules are critical for managing network security and ensuring that only authorized traffic can access certain resources. Panorama Security Rules can be configured in a variety of ways to meet the specific needs of your network.
+Panorama Security Rules are a feature within that control network access by defining the source and destination addresses, application, and action (allow, deny, or drop). These rules are critical for managing network security and ensuring that only authorized traffic can access certain resources. Panorama Security Rules can be configured in a variety of ways to meet the specific needs of your network.
 
 ## Table Usage Guide
 
-The `panos_security_rule` table provides insights into Panorama Security Rules within OCI. As a network administrator, explore rule-specific details through this table, including source and destination addresses, application, and action. Utilize it to manage network security and ensure that only authorized traffic can access certain resources.
+The `panos_security_rule` table provides insights into Panorama Security Rules within. As a network administrator, explore rule-specific details through this table, including source and destination addresses, application, and action. Utilize it to manage network security and ensure that only authorized traffic can access certain resources.
 
 ## Examples
 
