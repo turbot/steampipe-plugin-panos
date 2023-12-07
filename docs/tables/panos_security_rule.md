@@ -16,7 +16,7 @@ The `panos_security_rule` table provides insights into Panorama Security Rules w
 ### Basic ingress rule info
 Explore the specifics of your network's security rules, including the type, action, and details about source and destination zones and addresses. This can help you understand how your network's security is configured and identify potential vulnerabilities.
 
-```sql
+```sql+postgres
 select
   name,
   type,
@@ -30,10 +30,24 @@ from
   panos_security_rule;
 ```
 
+```sql+sqlite
+select
+  name,
+  type,
+  action,
+  source_zones,
+  source_addresses,
+  destination_zones,
+  destination_addresses,
+  source_users
+from
+  panos_security_rule;
+```
+
 ### List disabled security rules
 Uncover the details of inactive security rules to understand the system's potential vulnerabilities and areas for improvement.
 
-```sql
+```sql+postgres
 select
   name,
   type,
@@ -44,10 +58,34 @@ where
   disabled;
 ```
 
+```sql+sqlite
+select
+  name,
+  type,
+  description
+from
+  panos_security_rule
+where
+  disabled = 1;
+```
+
 ### Get security rules count by group
 Determine the number of security rules associated with each group to understand the level of security measures applied. This can help identify areas where security may be lacking or overly stringent.
 
-```sql
+```sql+postgres
+select
+  case
+    when group_tag is null then 'none'
+    else group_tag
+  end as group_tag,
+  count(*)
+from
+  panos_security_rule
+group by
+  group_tag;
+```
+
+```sql+sqlite
 select
   case
     when group_tag is null then 'none'
@@ -63,7 +101,7 @@ group by
 ### List security rules having public access to specific tagged addresses
 Determine the areas in which security rules allow public access to addresses tagged with high impact. This can help identify potential security risks and tighten access controls where necessary.
 
-```sql
+```sql+postgres
 with high_impact_tags as (
   select
     name
@@ -88,10 +126,14 @@ from
   join address_with_high_impact_tags as ht on r.source_addresses ? 'any' and r.destination_addresses ? ht.name;
 ```
 
+```sql+sqlite
+Error: SQLite does not support the '?' operator used in JSON queries in PostgreSQL.
+```
+
 ### List of security rules without `application` tag
 Discover the segments that lack an 'application' tag in your security rules. This can help you identify potential gaps in your rule tagging, thereby improving your security rule management.
 
-```sql
+```sql+postgres
 select
   name,
   type,
@@ -104,10 +146,23 @@ where
   not tags ? 'application';
 ```
 
+```sql+sqlite
+select
+  name,
+  type,
+  description,
+  source_zones,
+  destination_zones
+from
+  panos_security_rule
+where
+  not json_extract(tags, '$.application');
+```
+
 ### Lis security rules which contain any administrative tag with color yellow
 Explore which security rules contain administrative tags marked in yellow. This can be useful for quickly identifying and reviewing specific security policies in your network that are flagged with this color for administrative purposes.
 
-```sql
+```sql+postgres
 with yellow_tags as (
   select
     name
@@ -123,4 +178,21 @@ select
 from
   panos_security_rule
   join yellow_tags on panos_security_rule.tags ? yellow_tags.name;
+```
+
+```sql+sqlite
+select
+  panos_security_rule.name,
+  panos_security_rule.type,
+  panos_security_rule.description
+from
+  panos_security_rule
+  join (
+    select
+      name
+    from
+      panos_administrative_tag
+    where
+      color = 'color4' -- yellow
+  ) as yellow_tags on json_extract(panos_security_rule.tags, yellow_tags.name) is not null;
 ```

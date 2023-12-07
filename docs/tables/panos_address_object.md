@@ -16,7 +16,14 @@ The `panos_address_object` table provides insights into address objects within P
 ### List all address objects
 This query helps you explore all address objects in your network, allowing you to gain insights into the various network entities and their configurations. This is particularly useful in network management and security, where understanding the structure and organization of your network can aid in troubleshooting and threat mitigation.
 
-```sql
+```sql+postgres
+select
+  *
+from
+  panos_address_object;
+```
+
+```sql+sqlite
 select
   *
 from
@@ -26,13 +33,24 @@ from
 ### List all address objects ordered by object name
 Explore all address objects in an organized manner, sorted by their respective names. This helps in efficient management and easy identification of individual address objects.
 
-```sql
+```sql+postgres
 select
   name,
   value,
   description
 from
   panos_address_object;
+order by
+  name;
+```
+
+```sql+sqlite
+select
+  name,
+  value,
+  description
+from
+  panos_address_object
 order by
   name;
 ```

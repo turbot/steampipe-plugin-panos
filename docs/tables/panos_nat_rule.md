@@ -16,7 +16,7 @@ The `panos_nat_rule` table provides insights into NAT rules within Palo Alto Net
 ### List disabled NAT rules
 Discover the segments that consist of disabled NAT rules. This can help you identify potential security loopholes in your network, thereby enhancing its safety and efficiency.
 
-```sql
+```sql+postgres
 select
   name,
   uuid,
@@ -27,10 +27,34 @@ where
   disabled;
 ```
 
+```sql+sqlite
+select
+  name,
+  uuid,
+  type
+from
+  panos_nat_rule
+where
+  disabled = 1;
+```
+
 ### List NAT rules for a specific `vsys`
 Explore the configuration of Network Address Translation (NAT) rules for a specific virtual system. This would be particularly useful for network administrators seeking to understand and manage the routing of network traffic within their system.
 
-```sql
+```sql+postgres
+select
+  name,
+  uuid,
+  type,
+  disabled,
+  tags
+from
+  panos_nat_rule
+where
+  vsys = 'vsys1';
+```
+
+```sql+sqlite
 select
   name,
   uuid,
@@ -46,7 +70,20 @@ where
 ### List NAT rules for a **Panorama** device group
 Explore which NAT rules are active for a particular device group in a Panorama setup. This can help in identifying potential security risks or troubleshooting network issues.
 
-```sql
+```sql+postgres
+select
+  name,
+  uuid,
+  type,
+  disabled,
+  tags
+from
+  panos_nat_rule
+where
+  device_group = 'group1';
+```
+
+```sql+sqlite
 select
   name,
   uuid,
@@ -62,7 +99,20 @@ where
 ### Get count of NAT rules by distinct `group tag`
 Identify the number of Network Address Translation (NAT) rules associated with each unique group tag. This can be useful for monitoring and managing network traffic routing configurations.
 
-```sql
+```sql+postgres
+select
+  case
+    when group_tag is null then 'none'
+    else group_tag
+  end as group_tag,
+  count(*) as count
+from
+  panos_nat_rule
+group by
+  group_tag;
+```
+
+```sql+sqlite
 select
   case
     when group_tag is null then 'none'
@@ -78,7 +128,7 @@ group by
 ### List NAT rules which contain any administrative tag with color yellow
 Explore which NAT rules are tagged with an administrative marker of yellow color. This is useful for identifying specific configurations that may require attention or follow a certain administrative pattern.
 
-```sql
+```sql+postgres
 with yellow_tags as (
   select
     name
@@ -96,10 +146,27 @@ from
   join yellow_tags on panos_nat_rule.tags ? yellow_tags.name;
 ```
 
+```sql+sqlite
+select
+  panos_nat_rule.name,
+  panos_nat_rule.type,
+  panos_nat_rule.description
+from
+  panos_nat_rule
+join (
+  select
+    name
+  from
+    panos_administrative_tag
+  where
+    color='color4' -- color4 :: Yellow
+) as yellow_tags on json_extract(panos_nat_rule.tags, yellow_tags.name) is not null;
+```
+
 ### List NAT rules which move packets between different zones
 Uncover the details of NAT rules that facilitate packet transitions between distinct zones. This is useful in network management to identify potential areas of data flow and troubleshoot connectivity issues.
 
-```sql
+```sql+postgres
 select
   name,
   source_zones,
@@ -110,10 +177,26 @@ where
   not (source_zones ? destination_zone);
 ```
 
+```sql+sqlite
+Error: SQLite does not support the '?'' operator used in PostgreSQL for checking if a value exists in an array.
+```
+
 ### List NAT rules which translate to unknown addresses
 Determine the areas in which Network Address Translation (NAT) rules are translating to unidentified addresses. This is useful for identifying potential misconfigurations or security risks within your network infrastructure.
 
-```sql
+```sql+postgres
+select
+  name,
+  dat_address
+from
+  panos_nat_rule
+where
+  dat_address not in (
+    select name from panos_address_object
+  );
+```
+
+```sql+sqlite
 select
   name,
   dat_address

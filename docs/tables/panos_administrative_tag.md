@@ -19,7 +19,16 @@ The `panos_administrative_tag` table provides insights into the Administrative T
 ### Basic info
 Explore which administrative tags are currently in use. This can help in managing and organizing system resources more effectively.
 
-```sql
+```sql+postgres
+select
+  name,
+  color,
+  comment
+from
+  panos_administrative_tag;
+```
+
+```sql+sqlite
 select
   name,
   color,
@@ -31,7 +40,18 @@ from
 ### List administrative tags containing a specific color
 Explore which administrative tags are associated with a specific color. This can be useful in organizing and categorizing your tags based on color coding for easy identification and management.
 
-```sql
+```sql+postgres
+select
+  name,
+  color,
+  comment
+from
+  panos_administrative_tag
+where
+  color = 'color4';
+```
+
+```sql+sqlite
 select
   name,
   color,
@@ -45,7 +65,18 @@ where
 ### List administrative tags for a specific `vsys`
 Explore the administrative tags associated with a specific system. This helps in identifying and organizing resources in a network for better management and control.
 
-```sql
+```sql+postgres
+select
+  name,
+  color,
+  comment
+from
+  panos_administrative_tag
+where
+  vsys = 'vsys1';
+```
+
+```sql+sqlite
 select
   name,
   color,
@@ -59,7 +90,18 @@ where
 ### List administrative tags for a **Panorama** `device group`
 Explore the administrative tags associated with a specific device group in Panorama, allowing you to understand and manage the group's settings and comments.
 
-```sql
+```sql+postgres
+select
+  name,
+  color,
+  comment
+from
+  panos_administrative_tag
+where
+  device_group = 'group1';
+```
+
+```sql+sqlite
 select
   name,
   color,
