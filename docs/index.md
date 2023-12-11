@@ -8,6 +8,7 @@ name: panos
 description: Steampipe plugin to query PAN-OS firewalls, security policies and more.
 og_description: Query PAN-OS with SQL! Open source CLI. No DB required.
 og_image: "/images/plugins/turbot/panos-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # PAN-OS + Steampipe
