@@ -84,7 +84,4 @@ Environment variables are also available as an alternate configuration method:
 
 > Note: If `api_key` or `PANOS_API_KEY` is used, then `username / PANOS_USERNAME` and `password / PANOS_PASSWORD` are ignored.
 
-## Get involved
 
-- Open source: https://github.com/turbot/steampipe-plugin-panos
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
