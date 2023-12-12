@@ -2,33 +2,14 @@ package panos
 
 import (
 	"github.com/turbot/steampipe-plugin-sdk/v5/plugin"
-	"github.com/turbot/steampipe-plugin-sdk/v5/plugin/schema"
 )
 
 type panosConfig struct {
-	Hostname *string `cty:"hostname"`
-	APIKey   *string `cty:"api_key"`
-	Username *string `cty:"username"`
-	Password *string `cty:"password"`
-	Timeout  *int    `cty:"timeout"`
-}
-
-var ConfigSchema = map[string]*schema.Attribute{
-	"hostname": {
-		Type: schema.TypeString,
-	},
-	"api_key": {
-		Type: schema.TypeString,
-	},
-	"username": {
-		Type: schema.TypeString,
-	},
-	"password": {
-		Type: schema.TypeString,
-	},
-	"timeout": {
-		Type: schema.TypeInt,
-	},
+	Hostname *string `hcl:"hostname"`
+	APIKey   *string `hcl:"api_key"`
+	Username *string `hcl:"username"`
+	Password *string `hcl:"password"`
+	Timeout  *int    `hcl:"timeout"`
 }
 
 func ConfigInstance() interface{} {
