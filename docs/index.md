@@ -8,11 +8,12 @@ name: panos
 description: Steampipe plugin to query PAN-OS firewalls, security policies and more.
 og_description: Query PAN-OS with SQL! Open source CLI. No DB required.
 og_image: "/images/plugins/turbot/panos-social-graphic.png"
+engines: ["steampipe", "sqlite", "postgres", "export"]
 ---
 
 # PAN-OS + Steampipe
 
-[Steampipe](https://steampipe.io) is an open source CLI to instantly query cloud APIs using SQL.
+[Steampipe](https://steampipe.io) is an open-source zero-ETL engine to instantly query cloud APIs using SQL.
 
 [PAN-OS](https://docs.paloaltonetworks.com/pan-os) is the operating system for Palo Alto Networks NGFWs and Panorama.
 
@@ -83,7 +84,4 @@ Environment variables are also available as an alternate configuration method:
 
 > Note: If `api_key` or `PANOS_API_KEY` is used, then `username / PANOS_USERNAME` and `password / PANOS_PASSWORD` are ignored.
 
-## Get involved
 
-- Open source: https://github.com/turbot/steampipe-plugin-panos
-- Community: [Join #steampipe on Slack →](https://turbot.com/community/join)
