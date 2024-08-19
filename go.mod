@@ -1,12 +1,11 @@
 module github.com/turbot/steampipe-plugin-panos
 
 go 1.21.0
-
-toolchain go1.21.1
+toolchain go1.22.5
 
 require (
 	github.com/PaloAltoNetworks/pango v0.8.0
-	github.com/turbot/steampipe-plugin-sdk/v5 v5.10.1
+	github.com/turbot/steampipe-plugin-sdk/v5 v5.10.3
 )
 
 require (
