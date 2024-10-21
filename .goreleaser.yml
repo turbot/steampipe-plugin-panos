@@ -16,8 +16,10 @@ builds:
       - amd64
       - arm64
 
-    id: "steampipe-panos"
+    id: "steampipe"
     binary: "{{ .ProjectName }}.plugin"
+    flags:
+      - -tags=netgo
 
 archives:
   - format: gz
